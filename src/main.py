@@ -30,12 +30,12 @@ def hello_world(request):
 
 
 def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
-    IMG_SIZE = (800, 400)
+    IMG_SIZE = (580, 140)
     BG_COLOR = (255, 255, 255)
 
     TEXT_COLOR = (0, 0, 0)
 
-    BOX_OFFSET = (100, 100)  # px
+    BOX_OFFSET = (30, 50)  # px
     BOX_DIFF = (10, 10)  # px
     BOX_SIZE = 8  # px
     BOX_COLOR1 = (235, 237, 240)  # 0h /day
@@ -51,7 +51,7 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
 
     if dummy is True:
         x, y = BOX_OFFSET
-        draw.text((x, y), f"Not Found ID={id}", fill=TEXT_COLOR)
+        draw.text((x, y), f"NOT FOUND ID={id}", fill=TEXT_COLOR)
         im.save(fn)
         return fn
 
@@ -116,7 +116,28 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
     # font = ImageFont.truetype('Menlo.ttc', size=15)
 
     x, y = BOX_OFFSET
-    draw.text((x, y), f'{id}', fill=TEXT_COLOR)
+    y -= BOX_DIFF[1] * 3.5
+    draw.text((x, y), f'https://revinx.net/ustream/history/?id={id}', fill=TEXT_COLOR)
+
+    # legend
+    # box
+    x, y = BOX_OFFSET
+    x += 430
+    y -= BOX_DIFF[1] * 3
+    for c in (BOX_COLOR1, BOX_COLOR2, BOX_COLOR3, BOX_COLOR4, BOX_COLOR5):
+        draw.rectangle(
+            (x, y, x + BOX_SIZE, y + BOX_SIZE),
+            fill=c
+        )
+        x += BOX_DIFF[0] * 2
+
+    # text
+    x, y = BOX_OFFSET
+    x += 430
+    y -= BOX_DIFF[1] * 4.3
+    for t in ('0h', '~2h', '~6h', '~12h', ' ~24h'):
+        draw.text((x, y), t, fill=TEXT_COLOR)
+        x += BOX_DIFF[0] * 1.6
 
     im.save(fn)
     return fn
@@ -138,6 +159,7 @@ def _scrape_ustchecker(id=None):
         else:
             return None
 
+    username = None
     bc_data = {}
 
     url = f'https://revinx.net/ustream/history/?id={id}'
@@ -148,7 +170,7 @@ def _scrape_ustchecker(id=None):
         rows = soup.find_all('table', id='log')[1].find_all('tr')
     except Exception as e:
         print(e)
-        return
+        return username, bc_data
 
     for row in rows:
         d = row.find_all('td')
@@ -188,10 +210,13 @@ def _scrape_ustchecker(id=None):
 
 
 def grass_image_view(request):
-    id = 3
+    if request.args and 'id' in request.args:
+        id = request.args.get('id')
+    else:
+        return f"ID IS REQUIRED"
     username, bc_data = _scrape_ustchecker(id=id)
     if bc_data:
         img_fn = _generate_grass_image(id, username, bc_data)
     else:
-        img_fn = _generate_grass_image(dummy=True)
+        img_fn = _generate_grass_image(id, dummy=True)
     return send_file(img_fn, mimetype='image/jpg')
