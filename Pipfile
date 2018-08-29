@@ -5,8 +5,16 @@ name = "pypi"
 
 [packages]
 pillow = "*"
+"bs4" = "*"
+requests = "*"
+"html5lib" = "*"
+pykakasi = "*"
 
 [dev-packages]
+mypy = "*"
+"flake8" = "*"
+flask = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.7"
