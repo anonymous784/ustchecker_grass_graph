@@ -113,10 +113,10 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
     # k.setMode('J', 'a')
     # conv = k.getConverter()
 
-    font = ImageFont.truetype('Menlo.ttc', size=15)
+    # font = ImageFont.truetype('Menlo.ttc', size=15)
 
     x, y = BOX_OFFSET
-    draw.text((x, y), f'{id}', fill=TEXT_COLOR, font=font)
+    draw.text((x, y), f'{id}', fill=TEXT_COLOR)
 
     im.save(fn)
     return fn
