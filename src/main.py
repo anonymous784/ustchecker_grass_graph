@@ -4,7 +4,7 @@ from datetime import datetime, date, timedelta, timezone
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from bs4 import BeautifulSoup
-from flask import send_file
+from flask import request, send_file
 from pykakasi import kakasi
 
 
@@ -107,16 +107,16 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
         x += BOX_DIFF[0]
 
     # username
-    k = kakasi()
-    k.setMode('H', 'a')
-    k.setMode('K', 'a')
-    k.setMode('J', 'a')
-    conv = k.getConverter()
+    # k = kakasi()
+    # k.setMode('H', 'a')
+    # k.setMode('K', 'a')
+    # k.setMode('J', 'a')
+    # conv = k.getConverter()
 
     font = ImageFont.truetype('Menlo.ttc', size=15)
 
     x, y = BOX_OFFSET
-    draw.text((x, y), conv.do(username), fill=TEXT_COLOR, font=font)
+    draw.text((x, y), f'{id}', fill=TEXT_COLOR, font=font)
 
     im.save(fn)
     return fn
