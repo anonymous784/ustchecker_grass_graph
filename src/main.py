@@ -131,7 +131,7 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
 
     # username
     x, y = BOX_OFFSET
-    y -= BOX_DIFF[1] * 3.5
+    y -= BOX_DIFF[1] * 4
     draw.text(
         (x, y),
         f'{username} の過去１年間の配信記録',
