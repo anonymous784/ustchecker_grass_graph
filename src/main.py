@@ -1,11 +1,11 @@
 import re
+from pathlib import Path
 from uuid import uuid4
 from datetime import datetime, date, timedelta, timezone
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from bs4 import BeautifulSoup
 from flask import request, send_file
-from pykakasi import kakasi
 
 
 JST = timezone(timedelta(hours=9))
@@ -44,14 +44,27 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
     BOX_COLOR4 = (75, 151, 71)  # 6h - 12h /day
     BOX_COLOR5 = (48, 95, 46)  # 12h - 24h /day
 
+    def set_font(size=12):
+        font = ImageFont.truetype(
+            str(Path(__file__).parent.joinpath('misaki_gothic.ttf').resolve()),
+            size=size
+        )
+        return font
+
     fn = f'/tmp/{uuid4().hex}.jpg'
 
     im = Image.new('RGB', IMG_SIZE, color=BG_COLOR)
     draw = ImageDraw.Draw(im)
 
     if dummy is True:
+
         x, y = BOX_OFFSET
-        draw.text((x, y), f"NOT FOUND ID={id}", fill=TEXT_COLOR)
+        draw.text(
+            (x, y),
+            f"NOT FOUND ID = {id}",
+            fill=TEXT_COLOR,
+            font=set_font(32)
+        )
         im.save(fn)
         return fn
 
@@ -93,7 +106,12 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
     y += BOX_DIFF[1]
     _weekday = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat')
     for i in range(1, 7, 2):
-        draw.text((x, y), _weekday[i], fill=TEXT_COLOR)
+        draw.text(
+            (x, y),
+            _weekday[i],
+            fill=TEXT_COLOR,
+            font=set_font(12)
+        )
         y += BOX_DIFF[1] * 2
 
     # month
@@ -102,22 +120,24 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
     dt = start_date
     while dt <= end_date:
         if dt.day <= 7:
-            draw.text((x, y), f"{dt:%b}", fill=TEXT_COLOR)
+            draw.text(
+                (x, y),
+                f"{dt:%b}",
+                fill=TEXT_COLOR,
+                font=set_font(12)
+            )
         dt += timedelta(days=7)
         x += BOX_DIFF[0]
 
     # username
-    # k = kakasi()
-    # k.setMode('H', 'a')
-    # k.setMode('K', 'a')
-    # k.setMode('J', 'a')
-    # conv = k.getConverter()
-
-    # font = ImageFont.truetype('Menlo.ttc', size=15)
-
     x, y = BOX_OFFSET
     y -= BOX_DIFF[1] * 3.5
-    draw.text((x, y), f'https://revinx.net/ustream/history/?id={id}', fill=TEXT_COLOR)
+    draw.text(
+        (x, y),
+        f'{username} の過去１年間の配信記録',
+        fill=TEXT_COLOR,
+        font=set_font(18)
+    )
 
     # legend
     # box
@@ -136,8 +156,23 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
     x += 430
     y -= BOX_DIFF[1] * 4.3
     for t in ('0h', '~2h', '~6h', '~12h', ' ~24h'):
-        draw.text((x, y), t, fill=TEXT_COLOR)
-        x += BOX_DIFF[0] * 1.6
+        draw.text(
+            (x, y),
+            t,
+            fill=TEXT_COLOR,
+            font=set_font(12)
+        )
+        x += BOX_DIFF[0] * 1.5
+
+    x, y = BOX_OFFSET
+    x += 400
+    y += BOX_DIFF[1] * 7.5
+    draw.text(
+        (x, y),
+        "inspired by github.com",
+        fill=TEXT_COLOR,
+        font=set_font(12)
+    )
 
     im.save(fn)
     return fn
