@@ -162,7 +162,7 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
             fill=TEXT_COLOR,
             font=set_font(12)
         )
-        x += BOX_DIFF[0] * 1.5
+        x += BOX_DIFF[0] * 1.7
 
     x, y = BOX_OFFSET
     x += 400
