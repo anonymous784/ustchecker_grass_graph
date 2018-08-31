@@ -8,7 +8,6 @@ pillow = "*"
 "bs4" = "*"
 requests = "*"
 "html5lib" = "*"
-pykakasi = "*"
 
 [dev-packages]
 mypy = "*"
