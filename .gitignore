@@ -279,3 +279,5 @@ $RECYCLE.BIN/
 
 
 # End of https://www.gitignore.io/api/osx,linux,windows,python,django,visualstudiocode,node
+
+.gcloudignore
