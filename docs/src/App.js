@@ -21,6 +21,10 @@ class App extends Component {
     this.handlePost = this.handlePost.bind(this);
   }
 
+  componentDidMount(){
+    document.title = "ustchecker grass graph"
+  }
+
   handleChange(event) {
     this.setState({checkerId: event.target.value});
   }
@@ -36,6 +40,7 @@ class App extends Component {
       id: id
     });
     fetch(
+      // 'http://127.0.0.1:5000',
       'https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph',
       {
         method: 'POST',
@@ -43,6 +48,7 @@ class App extends Component {
         headers: {
           'Content-Type': 'application/json',
         },
+        mode: 'cors'
       }
     )
     .then(response => {

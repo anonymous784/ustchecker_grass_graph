@@ -1,4 +1,5 @@
 import re
+import json
 import base64
 from io import BytesIO
 from pathlib import Path
@@ -232,6 +233,7 @@ def grass_image_view(request):
     WHITELIST = ['https://anonymous784.github.io']
 
     headers = {}
+    print(request)
     origins = [val for key, val in request.headers if key == 'Origin']
     if len(origins) > 0:
         origin = origins[0]
@@ -239,8 +241,9 @@ def grass_image_view(request):
             if origin == allowed_url:
                 headers['Access-Control-Allow-Origin'] = allowed_url
                 break
-    headers["Content-Type"] = "application/json; charset=utf-8"
-    headers["Cache-Control"] = "public, max-age=30, s-maxage=60"
+    headers['Access-Control-Allow-Methods'] = "GET,POST,OPTIONS"
+    headers['Access-Control-Allow-Headers'] = "Origin,Content-Type"
+    headers['Content-Type'] = "application/json"
 
     # input
     request_json = request.get_json()
@@ -251,7 +254,7 @@ def grass_image_view(request):
         id = request.args.get('id')
         format = 'jpeg'
     else:
-        return f"ID IS REQUIRED"
+        return ('ID IS REQUIRED', headers)
 
     # generate image
     username, bc_data = _scrape_ustchecker(id=id)
@@ -266,6 +269,9 @@ def grass_image_view(request):
         img = Image.open(img_fn)
         img.save(buf, format='jpeg')
         base64_image = base64.b64encode(buf.getvalue())
-        return jsonify({'base64_image': base64_image.decode('ascii')})
+        return (
+            json.dumps({'base64_image': base64_image.decode('ascii')}),
+            headers
+        )
     else:
         return send_file(img_fn, mimetype='image/jpeg')
