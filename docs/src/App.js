@@ -5,6 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import ReactLoading from 'react-loading';
 
 
 class App extends Component {
@@ -12,7 +13,8 @@ class App extends Component {
     super(props);
     this.state = {
       checkerId: '',
-      base64Image: ''
+      base64Image: '',
+      loading: false
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -25,47 +27,76 @@ class App extends Component {
 
   handlePost(event) {
     const id = this.state.checkerId;
-    fetch(`https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph?id=${id}&format=base64`)
+    this.setState({
+      checkerId: '',
+      loading: true
+    })
+    console.log(`https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph?id=${id}&format=base64`);
+    fetch(
+      `https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph?id=${id}&format=base64`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        }
+      }
+    )
     .then(response => {
       if (response.status !== 200) {
-        console.error('handleCheckUrl');
+        console.error('handlePost');
+        console.log(response);
       }
       return response.json();
     })
     .then(data => {
       this.setState({
-        base64Image: data.base64_image
+        base64Image: data.base64_image,
+        loading: false
       });
     });
   }
 
 
   render() {
+    const Loading = () => {
+      return(
+        <ReactLoading className="preloader" type="spin" color="#3F53AF" height={'10%'} width={'10%'} />
+      )
+    };
+
     return (
       <div className="App">
         <AppBar position="static">
           <Toolbar>
             <Typography variant="title" color="inherit">
-              Photos
+              ustchecker grass graph
             </Typography>
           </Toolbar>
         </AppBar>
-        <TextField
-          id="checker_id"
-          label="チェッカーの登録ID"
-          placeholder="89"
-          margin="normal"
-          style={{ margin: '30px' }}
-          onChange={this.handleChange}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          disabled={!this.state.checkerId}
-          onClick={this.handlePost}
-        >
-          画像生成
-        </Button>
+
+        <form className="form">
+          <TextField
+            id="checker_id"
+            label="チェッカーの登録ID"
+            margin="normal"
+            style={{ margin: '30px' }}
+            onChange={this.handleChange}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!this.state.checkerId}
+            onClick={this.handlePost}
+          >
+            画像生成
+          </Button>
+        </form>
+
+        <div className="image" style={{ textAlign: 'center' }}>
+          {this.state.loading && <Loading/>}
+          {this.state.base64Image && <img src={`data:image/png;base64,${this.state.base64Image}`}/>}
+        </div>
+
       </div>
     );
   }

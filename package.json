@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "material-ui-image": "^3.0.0",
+    "react-loading": "^2.0.3"
+  }
+}
