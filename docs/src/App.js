@@ -31,13 +31,18 @@ class App extends Component {
       checkerId: '',
       loading: true
     })
+
+    const body = JSON.stringify({
+      id: id
+    });
     fetch(
-      `https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph?id=${id}&format=base64`,
+      'https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph',
       {
+        method: 'POST',
+        body: body,
         headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        }
+          'Content-Type': 'application/json',
+        },
       }
     )
     .then(response => {

@@ -229,16 +229,29 @@ def _scrape_ustchecker(id=None):
 
 
 def grass_image_view(request):
+    WHITELIST = ['https://anonymous784.github.io']
+
+    headers = {}
+    origins = [val for key, val in request.headers if key == 'Origin']
+    if len(origins) > 0:
+        origin = origins[0]
+        for allowed_url in WHITELIST:
+            if origin == allowed_url:
+                headers['Access-Control-Allow-Origin'] = allowed_url
+                break
+    headers["Content-Type"] = "application/json; charset=utf-8"
+    headers["Cache-Control"] = "public, max-age=30, s-maxage=60"
+
     # input
-    if request.args:
-        if 'id' in request.args:
-            id = request.args.get('id')
-        else:
-            return f"ID IS REQUIRED"
-        if 'format' in request.args:
-            format = request.args.get('format')
-        else:
-            format = 'jpeg'
+    request_json = request.get_json()
+    if request_json and 'id' in request_json:
+        id = request_json['id']
+        format = 'base64'
+    elif request.args and 'id' in request.args:
+        id = request.args.get('id')
+        format = 'jpeg'
+    else:
+        return f"ID IS REQUIRED"
 
     # generate image
     username, bc_data = _scrape_ustchecker(id=id)
