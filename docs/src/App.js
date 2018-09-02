@@ -31,7 +31,6 @@ class App extends Component {
       checkerId: '',
       loading: true
     })
-    console.log(`https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph?id=${id}&format=base64`);
     fetch(
       `https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph?id=${id}&format=base64`,
       {
