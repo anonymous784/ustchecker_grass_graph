@@ -1,32 +1,16 @@
 import re
+import base64
+from io import BytesIO
 from pathlib import Path
 from uuid import uuid4
 from datetime import datetime, date, timedelta, timezone
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from bs4 import BeautifulSoup
-from flask import request, send_file
+from flask import request, send_file, jsonify
 
 
 JST = timezone(timedelta(hours=9))
-
-
-def hello_world(request):
-    """Responds to any HTTP request.
-    Args:
-        request (flask.Request): HTTP request object.
-    Returns:
-        The response text or any set of values that can be turned into a
-        Response object using
-        `make_response <http://flask.pocoo.org/docs/0.12/api/#flask.Flask.make_response>`.
-    """
-    request_json = request.get_json()
-    if request.args and 'message' in request.args:
-        return request.args.get('message')
-    elif request_json and 'message' in request_json:
-        return request_json['message']
-    else:
-        return f'Hello World!'
 
 
 def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
@@ -245,13 +229,30 @@ def _scrape_ustchecker(id=None):
 
 
 def grass_image_view(request):
-    if request.args and 'id' in request.args:
-        id = request.args.get('id')
-    else:
-        return f"ID IS REQUIRED"
+    # input
+    if request.args:
+        if 'id' in request.args:
+            id = request.args.get('id')
+        else:
+            return f"ID IS REQUIRED"
+        if 'format' in request.args:
+            format = request.args.get('format')
+        else:
+            format = 'jpeg'
+
+    # generate image
     username, bc_data = _scrape_ustchecker(id=id)
     if bc_data:
         img_fn = _generate_grass_image(id, username, bc_data)
     else:
         img_fn = _generate_grass_image(id, dummy=True)
-    return send_file(img_fn, mimetype='image/jpg')
+
+    # output
+    if format == 'base64':
+        buf = BytesIO()
+        img = Image.open(img_fn)
+        img.save(buf, format='jpeg')
+        base64_image = base64.b64encode(buf.getvalue())
+        return jsonify({'base64_image': base64_image.decode('ascii')})
+    else:
+        return send_file(img_fn, mimetype='image/jpeg')
