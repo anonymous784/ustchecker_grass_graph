@@ -50,7 +50,7 @@ def _generate_grass_image(id=None, username=None, bc_data=None, dummy=False):
             fill=TEXT_COLOR,
             font=set_font(32)
         )
-        im.save(fn)
+        im.save(fn, quality=95)
         return fn
 
     # draw boxes
@@ -267,7 +267,7 @@ def grass_image_view(request):
     if format == 'base64':
         buf = BytesIO()
         img = Image.open(img_fn)
-        img.save(buf, format='jpeg')
+        img.save(buf, format='jpeg', quality=95)
         base64_image = base64.b64encode(buf.getvalue())
         return (
             json.dumps({'base64_image': base64_image.decode('ascii')}),

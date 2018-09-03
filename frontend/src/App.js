@@ -33,6 +33,7 @@ class App extends Component {
     const id = this.state.checkerId;
     this.setState({
       checkerId: '',
+      base64Image: '',
       loading: true
     })
 
@@ -40,7 +41,6 @@ class App extends Component {
       id: id
     });
     fetch(
-      // 'http://127.0.0.1:5000',
       'https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph',
       {
         method: 'POST',
