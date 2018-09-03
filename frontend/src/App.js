@@ -35,33 +35,34 @@ class App extends Component {
       checkerId: '',
       base64Image: '',
       loading: true
-    });
-
-    const body = JSON.stringify({
-      id: id
-    });
-    fetch(
-      'https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph',
-      {
-        method: 'POST',
-        body: body,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        mode: 'cors'
-      }
-    )
-    .then(response => {
-      if (response.status !== 200) {
-        console.error('handlePost');
-        console.log(response);
-      }
-      return response.json();
-    })
-    .then(data => {
-      this.setState({
-        base64Image: data.base64_image,
-        loading: false
+    },
+    () => {
+      const body = JSON.stringify({
+        id: id
+      });
+      fetch(
+        'https://asia-northeast1-develop-187803.cloudfunctions.net/ustchecker_grass_graph',
+        {
+          method: 'POST',
+          body: body,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors'
+        }
+      )
+      .then(response => {
+        if (response.status !== 200) {
+          console.error('handlePost');
+          console.log(response);
+        }
+        return response.json();
+      })
+      .then(data => {
+        this.setState({
+          base64Image: data.base64_image,
+          loading: false
+        });
       });
     });
   }
