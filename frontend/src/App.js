@@ -35,7 +35,7 @@ class App extends Component {
       checkerId: '',
       base64Image: '',
       loading: true
-    })
+    });
 
     const body = JSON.stringify({
       id: id
